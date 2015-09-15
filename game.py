@@ -1,18 +1,14 @@
 class Table(object):
 
-    def __init__(self, clone=None):
-        if clone:
-            self.turn = clone.turn
-            self.tab = [x[:] for x in clone.tab]
-        else:
-            self.turn = 0
-            self.tab = [[-1] * 8 for _ in xrange(8)]
-            for r in xrange(3):
-                for c in xrange(r & 1, 8, 2):
-                    self.tab[r][c] = 1
-            for r in xrange(5, 8):
-                for c in xrange(r & 1, 8, 2):
-                    self.tab[r][c] = 0
+    def __init__(self):
+        self.turn = 0
+        self.tab = [[-1] * 8 for _ in xrange(8)]
+        for r in xrange(3):
+            for c in xrange(r & 1, 8, 2):
+                self.tab[r][c] = 1
+        for r in xrange(5, 8):
+            for c in xrange(r & 1, 8, 2):
+                self.tab[r][c] = 0
 
     def __call__(self, row, col):
         return self.tab[row][col]
@@ -27,6 +23,14 @@ class Table(object):
             mid = [(src[x] + dst[x]) >> 1 for x in xrange(2)]
             self.tab[mid[0]][mid[1]] = -1
         self.turn = 1 - self.turn
+
+    def restore_move(self, src, dst, eat):
+        self.turn = 1 - self.turn
+        self.tab[src[0]][src[1]] = self.turn
+        self.tab[dst[0]][dst[1]] = -1
+        if eat:
+            mid = [(src[x] + dst[x]) >> 1 for x in xrange(2)]
+            self.tab[mid[0]][mid[1]] = 1 - self.turn
 
     def move(self, src, dst):
         if not self.valid(*src) or not self.valid(*dst) or \
